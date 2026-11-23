@@ -229,7 +229,7 @@ function readHunk(lines: string[], hdrIdx: number, a: number): { hunk: Hunk; nex
 
 function parseUnified(lines: string[], strict: boolean): Edit[] {
   const sections: UniSection[] = [];
-  const diffGitRe = /^diff --git a\/(.*?) b\/(.*)$/;
+  const diffGitRe = /^diff --git a\/(\S+) b\/(\S+)$/;
   const hunkRe = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/;
   let cur: UniSection | null = null;
   let state: 'between' | 'header' | 'afterHunk' = 'between';
@@ -506,11 +506,9 @@ function parseV4a(lines: string[], strict: boolean): Edit[] {
       const updLine = i;
       i++;
       let moveTo: string | null = null;
-      let j = i;
-      while (j < end && blank(lines[j]!)) j++;
-      if (j < end && lines[j]!.startsWith('*** Move to: ')) {
-        moveTo = lines[j]!.slice('*** Move to: '.length).trim();
-        i = j + 1;
+      if (i < end && lines[i]!.startsWith('*** Move to: ')) {
+        moveTo = lines[i]!.slice('*** Move to: '.length).trim();
+        i++;
       }
       const chunks: V4aChunk[] = [];
       let firstChunk = true;
